@@ -2,6 +2,7 @@
 La finalidad de este repositorio es entender la estructura de este proyecto, paso a paso y a profundidad
 , para entender como funcionan cada carpeta
 
+Al revisar la estructura de tu proyecto DermaNube, se observa que sigue un diseño de Microservicios y DevOps avanzado en la nube
 ## 📐 Estructura del Proyecto
 
 ```text
