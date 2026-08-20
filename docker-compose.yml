@@ -1,32 +1,7 @@
 version: '3.8'
 
 services:
-  # ============================================
-  # BASE DE DATOS (PostgreSQL)
-  # ============================================
-  database:
-    image: postgres:15-alpine
-    container_name: postgres_db
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: mi_app_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d mi_app_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - app_network
-
-  # ============================================
   # APP 1 - Frontend (React)
-  # ============================================
   app1:
     image: somedockerimagename
     container_name: app1_react
@@ -43,10 +18,7 @@ services:
       retries: 3
     networks:
       - app_network
-
-  # ============================================
   # APP 2 - Frontend (React)
-  # ============================================
   app2:
     image: somedockerimagename
     container_name: app2_react
@@ -63,10 +35,7 @@ services:
       retries: 3
     networks:
       - app_network
-
-  # ============================================
   # API 1 - Backend (Node.js/Express)
-  # ============================================
   api1:
     image: node:18-alpine
     container_name: api1_node
@@ -92,10 +61,7 @@ services:
       retries: 3
     networks:
       - app_network
-
-  # ============================================
   # API 2 - Backend (Node.js/Express)
-  # ============================================
   api2:
     image: node:18-alpine
     container_name: api2_node
@@ -121,17 +87,31 @@ services:
       retries: 3
     networks:
       - app_network
-
-# ============================================
+  # BASE DE DATOS (PostgreSQL)
+  database:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: mi_app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d mi_app_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
 # VOLÚMENES
-# ============================================
 volumes:
   postgres_data:
     driver: local
-
-# ============================================
 # REDES
-# ============================================
 networks:
   app_network:
     driver: bridge
