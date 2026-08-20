@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # BASE DE DATOS (PostgreSQL)
+  # ============================================
+  database:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: mi_app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d mi_app_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+  # ============================================
+  # APP 1 - Frontend (React)
+  # ============================================
+  app1:
+    image: somedockerimagename
+    container_name: app1_react
+    ports:
+      - "8081:80"
+    restart: always
+    depends_on:
+      - api1
+      - api2
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-s", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app_network
+
+  # ============================================
+  # APP 2 - Frontend (React)
+  # ============================================
+  app2:
+    image: somedockerimagename
+    container_name: app2_react
+    ports:
+      - "8082:80"
+    restart: always
+    depends_on:
+      - api1
+      - api2
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-s", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app_network
+
+  # ============================================
+  # API 1 - Backend (Node.js/Express)
+  # ============================================
+  api1:
+    image: node:18-alpine
+    container_name: api1_node
+    working_dir: /usr/src/app
+    volumes:
+      - ./api1:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://admin:admin123@database:5432/mi_app_db
+    command: npm start
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app_network
+
+  # ============================================
+  # API 2 - Backend (Node.js/Express)
+  # ============================================
+  api2:
+    image: node:18-alpine
+    container_name: api2_node
+    working_dir: /usr/src/app
+    volumes:
+      - ./api2:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "3002:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://admin:admin123@database:5432/mi_app_db
+    command: npm start
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app_network
+
+# ============================================
+# VOLÚMENES
+# ============================================
+volumes:
+  postgres_data:
+    driver: local
+
+# ============================================
+# REDES
+# ============================================
+networks:
+  app_network:
+    driver: bridge
+    name: app_network
