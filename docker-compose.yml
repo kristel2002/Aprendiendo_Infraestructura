@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # APP 1 - Frontend (React)
   app1:
-    image: somedockerimagename
+    image: alpine:edge
     container_name: app1_react
     ports:
       - "8081:80"
@@ -20,7 +20,7 @@ services:
       - app_network
   # APP 2 - Frontend (React)
   app2:
-    image: somedockerimagename
+    image: hashicorp/terraform:latest
     container_name: app2_react
     ports:
       - "8082:80"
@@ -37,7 +37,7 @@ services:
       - app_network
   # API 1 - Backend (Node.js/Express)
   api1:
-    image: node:18-alpine
+    image: node:trixie-slim
     container_name: api1_node
     working_dir: /usr/src/app
     volumes:
@@ -63,7 +63,7 @@ services:
       - app_network
   # API 2 - Backend (Node.js/Express)
   api2:
-    image: node:18-alpine
+    image:  node:trixie 
     container_name: api2_node
     working_dir: /usr/src/app
     volumes:
@@ -89,7 +89,7 @@ services:
       - app_network
   # BASE DE DATOS (PostgreSQL)
   database:
-    image: postgres:15-alpine
+    image: postgres:15-alpine3.23
     container_name: postgres_db
     environment:
       POSTGRES_USER: admin
